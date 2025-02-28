@@ -1,0 +1,71 @@
+import React from "react";
+import { Link, Navigate } from "react-router-dom";
+import LoginForm from "../components/auth/LoginForm";
+import { useAuth } from "@/contexts/AuthContext";
+
+const LoginPage = () => {
+  const { isAuthenticated, user } = useAuth();
+
+  // If user is already authenticated, redirect to the appropriate dashboard
+  if (isAuthenticated && user) {
+    return <Navigate to={`/dashboard/${user.role}`} replace />;
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Header section */}
+      <header className="w-full h-20 bg-white border-b border-gray-200 px-4 md:px-6 lg:px-8 flex items-center">
+        <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
+              <span className="text-white font-bold">JM</span>
+            </div>
+            <span className="text-xl font-bold">JobMatch</span>
+          </Link>
+        </div>
+        <div className="ml-auto flex items-center gap-4">
+          <Link
+            to="/register"
+            className="text-sm font-medium text-gray-600 hover:text-gray-900"
+          >
+            Register
+          </Link>
+          <Link to="/login" className="text-sm font-medium text-primary">
+            Login
+          </Link>
+        </div>
+      </header>
+
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold">Welcome Back</h1>
+            <p className="text-gray-600 mt-2">
+              Sign in to access your account and dashboard
+            </p>
+          </div>
+
+          <LoginForm />
+
+          <div className="mt-8 text-center text-sm text-gray-600">
+            <p>
+              New to JobMatch?{" "}
+              <Link
+                to="/register"
+                className="text-primary font-medium hover:underline"
+              >
+                Create an account
+              </Link>
+            </p>
+          </div>
+        </div>
+      </main>
+
+      <footer className="py-6 text-center text-sm text-gray-500">
+        <p>© {new Date().getFullYear()} JobMatch. All rights reserved.</p>
+      </footer>
+    </div>
+  );
+};
+
+export default LoginPage;
