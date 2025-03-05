@@ -1,6 +1,18 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Bell, Settings, LogOut, Search, Menu } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  Settings,
+  LogOut,
+  Search,
+  Menu,
+  Clock,
+  Home,
+  Briefcase,
+  User,
+  BarChart2,
+  MessageSquare,
+  Edit,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,11 +23,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
+import LiveCounter from "./LiveCounter";
+import { useAuth } from "@/contexts/AuthContext";
+import { usePremium } from "@/contexts/PremiumContext";
+import AvatarSelector from "@/components/AvatarSelector";
 
 interface DashboardHeaderProps {
   userName?: string;
-  userRole?: "client" | "vendor";
+  userRole?: "client" | "vendor" | "admin";
   notificationCount?: number;
   avatarUrl?: string;
 }
@@ -24,97 +39,228 @@ const DashboardHeader = ({
   userName = "John Doe",
   userRole = "client",
   notificationCount = 3,
-  avatarUrl = "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
+  avatarUrl = "https://api.dicebear.com/7.x/shapes/svg?seed=John",
 }: DashboardHeaderProps) => {
+  const { logout, user } = useAuth();
+  const { premiumStatus } = usePremium();
+  const [sessionTime, setSessionTime] = useState(0);
+  const [sessionStartTime] = useState(Date.now());
+  const location = useLocation();
+  const [isAvatarSelectorOpen, setIsAvatarSelectorOpen] = useState(false);
+  const [userAvatar, setUserAvatar] = useState(avatarUrl);
+
+  // Use user data if available
+  const displayName = user
+    ? `${user.user_metadata?.first_name || ""} ${user.user_metadata?.last_name || ""}`
+    : userName;
+
+  // Track session time
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSessionTime(Math.floor((Date.now() - sessionStartTime) / 1000));
+    }, 1000);
+
+    // Log session start to localStorage
+    const sessionLog = JSON.parse(localStorage.getItem("sessionLog") || "[]");
+    sessionLog.push({
+      startTime: new Date(sessionStartTime).toISOString(),
+      userAgent: navigator.userAgent,
+    });
+    localStorage.setItem("sessionLog", JSON.stringify(sessionLog));
+
+    return () => {
+      clearInterval(timer);
+      // Log session end when component unmounts
+      const endSessionLog = JSON.parse(
+        localStorage.getItem("sessionLog") || "[]",
+      );
+      if (endSessionLog.length > 0) {
+        const lastSession = endSessionLog[endSessionLog.length - 1];
+        lastSession.endTime = new Date().toISOString();
+        lastSession.duration = Math.floor(
+          (Date.now() - sessionStartTime) / 1000,
+        );
+        localStorage.setItem("sessionLog", JSON.stringify(endSessionLog));
+      }
+    };
+  }, [sessionStartTime]);
+
+  // Format session time as HH:MM:SS
+  const formatSessionTime = () => {
+    const hours = Math.floor(sessionTime / 3600);
+    const minutes = Math.floor((sessionTime % 3600) / 60);
+    const seconds = sessionTime % 60;
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  };
+
   return (
-    <header className="w-full h-20 bg-white border-b border-gray-200 px-4 md:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-10">
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <Menu className="h-5 w-5" />
-        </Button>
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
-            <span className="text-white font-bold">JM</span>
-          </div>
-          <span className="text-xl font-bold hidden md:inline-block">
-            JobMatch
-          </span>
-        </Link>
-      </div>
-
-      <div className="hidden md:flex items-center gap-6 flex-1 max-w-md mx-4 lg:mx-8">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
+    <>
+      <header className="w-full h-12 bg-white border-b border-gray-200 px-4 md:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-10">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="md:hidden">
+            <Menu className="h-5 w-5" />
+          </Button>
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-purple rounded-md flex items-center justify-center">
+              <span className="text-white font-bold">TVC</span>
+            </div>
+            <span className="text-xl font-bold hidden md:inline-block">
+              TheVendorsConnect
+            </span>
+          </Link>
         </div>
-      </div>
-
-      <div className="flex items-center gap-2 md:gap-4">
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          {notificationCount > 0 && (
-            <Badge
-              variant="destructive"
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-            >
-              {notificationCount}
-            </Badge>
-          )}
-        </Button>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="p-0 h-10 w-10 rounded-full">
-              <Avatar>
-                <AvatarImage src={avatarUrl} alt={userName} />
-                <AvatarFallback>
-                  {userName
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>
-              <div className="flex flex-col">
-                <span>{userName}</span>
-                <span className="text-xs text-gray-500 capitalize">
-                  {userRole}
-                </span>
+        <div className="hidden md:flex items-center gap-6 flex-1 max-w-xl mx-4 lg:mx-8">
+          <div className="w-full"></div>
+        </div>
+        <div className="flex items-center gap-2 md:gap-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="relative group">
+                <Button variant="ghost" className="p-0 h-10 w-10 rounded-md">
+                  <Avatar className="bg-gradient-to-br from-purple to-pink rounded-md">
+                    <AvatarImage
+                      src={userAvatar}
+                      alt={userName}
+                      className="rounded-md"
+                    />
+                    <AvatarFallback className="bg-gradient-to-br from-purple to-pink text-white rounded-md">
+                      {userName
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+                <button
+                  className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-sm border border-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => setIsAvatarSelectorOpen(true)}
+                >
+                  <Edit className="h-3 w-3 text-gray-600" />
+                </button>
               </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link to="/profile" className="flex items-center w-full">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <button
-                onClick={() => {
-                  // Call the logout function from useAuth
-                  const { logout } =
-                    require("@/contexts/AuthContext").useAuth();
-                  logout();
-                }}
-                className="flex items-center w-full text-destructive"
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>
+                <div className="flex flex-col">
+                  <span>{displayName || userName}</span>
+                  <span className="text-xs text-gray-500 capitalize">
+                    {userRole}
+                  </span>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Link to="/profile" className="flex items-center w-full">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <button
+                  onClick={logout}
+                  className="flex items-center w-full text-destructive"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
+                </button>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </header>
+
+      {/* Global Navigation Bar */}
+      <nav className="bg-white border-b border-gray-200 shadow-sm sticky top-12 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-12">
+            <div className="flex space-x-8">
+              <Link
+                to="/"
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${location.pathname === "/" ? "border-purple text-purple" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
               >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Logout</span>
-              </button>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </header>
+                <Home className="mr-2 h-4 w-4" />
+                Home
+              </Link>
+
+              <Link
+                to={`/dashboard/${userRole}`}
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${location.pathname.includes("/dashboard") ? "border-purple text-purple" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
+              >
+                <BarChart2 className="mr-2 h-4 w-4" />
+                Dashboard
+              </Link>
+
+              {userRole === "vendor" && (
+                <Link
+                  to="/dashboard/vendor?tab=applications"
+                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${location.pathname.includes("/applications") || location.search.includes("applications") ? "border-purple text-purple" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
+                >
+                  <Briefcase className="mr-2 h-4 w-4" />
+                  Applications
+                </Link>
+              )}
+
+              {userRole === "client" && (
+                <Link
+                  to="/dashboard/client?tab=jobs"
+                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${location.pathname.includes("/jobs") || location.search.includes("jobs") ? "border-purple text-purple" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
+                >
+                  <Briefcase className="mr-2 h-4 w-4" />
+                  Job Postings
+                </Link>
+              )}
+
+              <Link
+                to="/profile"
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${location.pathname.includes("/profile") ? "border-purple text-purple" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
+              >
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </Link>
+
+              <Link
+                to="/messages"
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${location.pathname.includes("/messages") ? "border-purple text-purple" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
+              >
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Messages
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+      {/* Avatar Selector Modal */}
+      <AvatarSelector
+        isOpen={isAvatarSelectorOpen}
+        onClose={() => setIsAvatarSelectorOpen(false)}
+        onSelect={(newAvatar) => {
+          setUserAvatar(newAvatar);
+          // In a real app, this would update the user's avatar in the database
+          localStorage.setItem("userAvatar", newAvatar);
+
+          // Show success message
+          const message = document.createElement("div");
+          message.className =
+            "fixed top-4 right-4 p-4 rounded-md bg-green-100 text-green-800 border border-green-200 shadow-md z-50 animate-in fade-in slide-in-from-top-5 duration-300";
+          message.innerHTML = `<div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <span>Avatar updated successfully!</span>
+          </div>`;
+          document.body.appendChild(message);
+
+          setTimeout(() => {
+            message.classList.add(
+              "animate-out",
+              "fade-out",
+              "slide-out-to-top-5",
+            );
+            setTimeout(() => document.body.removeChild(message), 300);
+          }, 3000);
+        }}
+        currentAvatar={userAvatar}
+      />
+    </>
   );
 };
 

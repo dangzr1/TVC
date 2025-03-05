@@ -1,12 +1,23 @@
-import { Suspense } from "react";
-import { useRoutes, Routes, Route, Navigate } from "react-router-dom";
+import React, { Suspense, useEffect } from "react";
+import {
+  useRoutes,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import Home from "./components/home";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import VerifyEmailPage from "./pages/verify-email";
 import ClientDashboard from "./pages/dashboard/client";
 import VendorDashboard from "./pages/dashboard/vendor";
+import ProfilePage from "./pages/profile";
+import UserProfile from "./pages/profile/[id]";
+import MessagesPage from "./pages/messages";
+import ApplicationTrackerPage from "./pages/dashboard/application-tracker";
 import { useAuth } from "./contexts/AuthContext";
+import { PremiumProvider } from "./contexts/PremiumContext";
 import routes from "tempo-routes";
 
 // Protected route component
@@ -42,6 +53,19 @@ const ProtectedRoute = ({
 
 function App() {
   const { isLoading } = useAuth();
+  const location = useLocation();
+
+  // Handle URL parameters for tab selection
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const tab = searchParams.get("tab");
+
+    // Handle tab parameter (e.g., for premium tab in profile)
+    if (tab && location.pathname === "/profile") {
+      // Set active tab in profile page
+      localStorage.setItem("active_profile_tab", tab);
+    }
+  }, [location]);
 
   if (isLoading) {
     return (
@@ -59,12 +83,21 @@ function App() {
         </div>
       }
     >
-      <>
+      <PremiumProvider>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/profile/:id" element={<UserProfile />} />
           <Route
             path="/dashboard/client"
             element={
@@ -81,14 +114,64 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/dashboard/application-tracker"
+            element={
+              <ProtectedRoute>
+                <ApplicationTrackerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <ProtectedRoute>
+                <MessagesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/faq"
+            element={
+              <Suspense fallback={<div>Loading...</div>}>
+                {React.createElement(React.lazy(() => import("./pages/faq")))}
+              </Suspense>
+            }
+          />
+          <Route
+            path="/privacy"
+            element={
+              <Suspense fallback={<div>Loading...</div>}>
+                {React.createElement(
+                  React.lazy(() => import("./pages/privacy")),
+                )}
+              </Suspense>
+            }
+          />
+          <Route
+            path="/terms"
+            element={
+              <Suspense fallback={<div>Loading...</div>}>
+                {React.createElement(React.lazy(() => import("./pages/terms")))}
+              </Suspense>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <Suspense fallback={<div>Loading...</div>}>
+                {React.createElement(React.lazy(() => import("./pages/admin")))}
+              </Suspense>
+            }
+          />
           {/* Add a catch-all route that redirects to home */}
           {import.meta.env.VITE_TEMPO === "true" && (
-            <Route path="/tempobook/*" />
+            <Route path="/tempobook/*" element={<div />} />
           )}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
-      </>
+      </PremiumProvider>
     </Suspense>
   );
 }

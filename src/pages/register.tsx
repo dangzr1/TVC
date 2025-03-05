@@ -17,10 +17,12 @@ const RegisterPage = () => {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center">
-                <span className="text-white font-bold text-xl">JM</span>
+              <div className="w-10 h-10 bg-purple rounded-md flex items-center justify-center">
+                <span className="text-white font-bold text-xl">TVC</span>
               </div>
-              <span className="ml-2 text-xl font-bold">JobMatch</span>
+              <span className="ml-2 text-xl font-bold text-purple">
+                TheVendorsConnect
+              </span>
             </Link>
           </div>
           <nav>
@@ -45,7 +47,7 @@ const RegisterPage = () => {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold">Create Your Account</h1>
             <p className="text-gray-600 mt-2">
-              Join our platform to connect with opportunities
+              Join our platform to connect with couples planning their wedding
             </p>
           </div>
 
@@ -54,7 +56,9 @@ const RegisterPage = () => {
       </main>
 
       <footer className="py-6 text-center text-gray-500 text-sm">
-        <p>© {new Date().getFullYear()} JobMatch. All rights reserved.</p>
+        <p>
+          © {new Date().getFullYear()} TheVendorsConnect. All rights reserved.
+        </p>
       </footer>
     </div>
   );

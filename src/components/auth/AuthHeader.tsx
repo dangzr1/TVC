@@ -47,11 +47,11 @@ const AuthHeader = ({
           <Menu className="h-5 w-5" />
         </Button>
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
-            <span className="text-white font-bold">JM</span>
+          <div className="w-8 h-8 bg-gradient-to-r from-teal-600 to-indigo-600 rounded-md flex items-center justify-center">
+            <span className="text-white font-bold">TVC</span>
           </div>
-          <span className="text-xl font-bold hidden md:inline-block">
-            JobMatch
+          <span className="text-xl font-bold hidden md:inline-block bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-indigo-600">
+            TheVendorsConnect
           </span>
         </Link>
       </div>

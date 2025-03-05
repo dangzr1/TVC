@@ -125,3 +125,20 @@
 6. Set up a custom domain (optional):
    - Add a CNAME record pointing to your Space URL
    - Configure the Space to use your custom domain
+
+## Integration with TempoLabs
+
+To integrate with TempoLabs for seamless updates:
+
+1. Use the Git tab in TempoLabs to connect to GitHub
+2. Push your changes to GitHub
+3. Configure DigitalOcean App Platform to deploy from your GitHub repository
+4. Set up automatic deployments so when you push changes from TempoLabs to GitHub, your site is automatically updated
+
+Don't forget to set up the same environment variables in DigitalOcean that you have in TempoLabs:
+- SUPABASE_PROJECT_ID
+- SUPABASE_URL
+- SUPABASE_ANON_KEY
+- SUPABASE_SERVICE_KEY
+- VITE_SUPABASE_URL
+- VITE_SUPABASE_ANON_KEY

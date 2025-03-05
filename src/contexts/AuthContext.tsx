@@ -18,6 +18,7 @@ interface AuthContextType {
   user: UserProfile | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   login: (data: UserLoginData) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   loginWithApple: () => Promise<void>;
@@ -34,6 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,6 +55,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             createdAt: currentUser.created_at,
           };
           setUser(userProfile);
+
+          // Check if user is admin
+          setIsAdmin(currentUser.user_metadata?.role === "admin");
         }
       } catch (error) {
         console.error("Auth initialization error:", error);
@@ -76,8 +81,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           createdAt: authUser.created_at,
         };
         setUser(userProfile);
+
+        // Check if user is admin
+        setIsAdmin(authUser.user_metadata?.role === "admin");
       } else {
         setUser(null);
+        setIsAdmin(false);
       }
       setIsLoading(false);
     });
@@ -98,7 +107,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const currentUser = await getCurrentUser();
       if (currentUser) {
         const role = currentUser.user_metadata?.role || "client";
-        navigate(`/dashboard/${role}`);
+        if (role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate(`/dashboard/${role}`);
+        }
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -192,6 +205,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     user,
     isLoading,
     isAuthenticated: !!user,
+    isAdmin,
     login,
     loginWithGoogle,
     loginWithApple,

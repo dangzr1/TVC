@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import JobApplicationModal from "./JobApplicationModal";
 import {
   Search,
   Filter,
@@ -104,10 +105,19 @@ const JobBrowser = ({ jobs = [] }: JobBrowserProps) => {
     console.log(`Toggled favorite status for job ${jobId}`);
   };
 
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
+
   // Apply for job
-  const applyForJob = (jobId: string) => {
-    // This would typically navigate to application form or open a modal
-    console.log(`Applied for job ${jobId}`);
+  const applyForJob = (job: Job) => {
+    setSelectedJob(job);
+    setIsApplicationModalOpen(true);
+  };
+
+  // Handle successful application
+  const handleApplicationSuccess = () => {
+    // In a real app, this would update the job status or show a success message
+    console.log(`Successfully applied for job ${selectedJob?.id}`);
   };
 
   return (
@@ -232,7 +242,16 @@ const JobBrowser = ({ jobs = [] }: JobBrowserProps) => {
                 >
                   View Details
                 </Button>
-                <Button onClick={() => applyForJob(job.id)}>Apply Now</Button>
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    applyForJob(job);
+                  }}
+                  className="bg-purple hover:bg-purple/90"
+                >
+                  Apply Now
+                </Button>
               </CardFooter>
             </Card>
           ))}
@@ -260,6 +279,14 @@ const JobBrowser = ({ jobs = [] }: JobBrowserProps) => {
           </Button>
         </div>
       </div>
+
+      {/* Job Application Modal */}
+      <JobApplicationModal
+        isOpen={isApplicationModalOpen}
+        onClose={() => setIsApplicationModalOpen(false)}
+        job={selectedJob}
+        onSuccess={handleApplicationSuccess}
+      />
     </div>
   );
 };

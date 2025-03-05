@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Link, useSearchParams, Navigate } from "react-router-dom";
+import {
+  Link,
+  useSearchParams,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import VerificationStatus from "@/components/auth/VerificationStatus";
@@ -12,10 +18,12 @@ const SimpleHeader = () => {
     <header className="w-full h-20 bg-white border-b border-gray-200 px-4 md:px-6 lg:px-8 flex items-center">
       <div className="flex items-center gap-2">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
-            <span className="text-white font-bold">JM</span>
+          <div className="w-8 h-8 bg-purple rounded-md flex items-center justify-center">
+            <span className="text-white font-bold">TVC</span>
           </div>
-          <span className="text-xl font-bold">JobMatch</span>
+          <span className="text-xl font-bold text-purple">
+            TheVendorsConnect
+          </span>
         </Link>
       </div>
     </header>
@@ -26,13 +34,13 @@ const VerifyEmailPage = () => {
   const { isAuthenticated, user, verifyUserEmail, resendVerification } =
     useAuth();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const email = searchParams.get("email") || "user@example.com";
-  const token = searchParams.get("token");
-
-  // In a real app, you would verify the token with your backend
-  // For this UI scaffolding, we'll simulate verification based on token presence
+  const [token, setToken] = useState<string | null>(null);
   const [isVerified, setIsVerified] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Calculate expiry time (12 hours from now)
   const expiryTime = new Date(Date.now() + 12 * 60 * 60 * 1000);
@@ -43,23 +51,20 @@ const VerifyEmailPage = () => {
   }
 
   useEffect(() => {
-    // If token is present in URL, verify the email
-    if (token) {
-      const verifyEmail = async () => {
-        setIsVerifying(true);
-        try {
-          await verifyUserEmail(token);
-          setIsVerified(true);
-        } catch (error) {
-          console.error("Email verification failed:", error);
-        } finally {
-          setIsVerifying(false);
-        }
-      };
+    // Extract token from hash fragment
+    const hashParams = new URLSearchParams(location.hash.substring(1));
+    const accessToken = hashParams.get("access_token");
+    if (accessToken) {
+      setToken(accessToken);
+      handleVerification(accessToken);
 
-      verifyEmail();
+      // Fix the localhost redirect issue by replacing the URL
+      if (location.hash.includes("localhost")) {
+        const currentUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, currentUrl);
+      }
     }
-  }, [token, verifyUserEmail]);
+  }, [location]);
 
   // Check if the URL contains a type=recovery or type=signup parameter
   // This is how Supabase redirects back after email verification
@@ -67,8 +72,31 @@ const VerifyEmailPage = () => {
     const type = searchParams.get("type");
     if (type === "signup" || type === "recovery") {
       setIsVerified(true);
+
+      // Automatically redirect to dashboard after verification
+      setTimeout(() => {
+        navigate("/dashboard/vendor");
+      }, 3000);
     }
-  }, [searchParams]);
+  }, [searchParams, navigate]);
+
+  const handleVerification = async (accessToken: string) => {
+    setIsVerifying(true);
+    try {
+      await verifyUserEmail(accessToken);
+      setIsVerified(true);
+
+      // Automatically redirect to dashboard after verification
+      setTimeout(() => {
+        navigate("/dashboard/vendor");
+      }, 3000);
+    } catch (error: any) {
+      console.error("Email verification failed:", error);
+      setError(error.message || "Failed to verify email. Please try again.");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   const handleResendVerification = async () => {
     setIsVerifying(true);
@@ -103,6 +131,9 @@ const VerifyEmailPage = () => {
           <VerificationStatus
             email={email}
             isVerified={isVerified}
+            isVerifying={isVerifying}
+            error={error}
+            token={token}
             expiryTime={expiryTime}
             resendVerification={handleResendVerification}
           />
@@ -120,7 +151,9 @@ const VerifyEmailPage = () => {
       </main>
 
       <footer className="py-6 text-center text-sm text-gray-500 border-t border-gray-200">
-        <p>© {new Date().getFullYear()} JobMatch. All rights reserved.</p>
+        <p>
+          © {new Date().getFullYear()} TheVendorsConnect. All rights reserved.
+        </p>
       </footer>
     </div>
   );

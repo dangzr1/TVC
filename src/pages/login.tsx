@@ -17,10 +17,12 @@ const LoginPage = () => {
       <header className="w-full h-20 bg-white border-b border-gray-200 px-4 md:px-6 lg:px-8 flex items-center">
         <div className="flex items-center gap-2">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
-              <span className="text-white font-bold">JM</span>
+            <div className="w-8 h-8 bg-purple rounded-md flex items-center justify-center">
+              <span className="text-white font-bold">TVC</span>
             </div>
-            <span className="text-xl font-bold">JobMatch</span>
+            <span className="text-xl font-bold text-purple">
+              TheVendorsConnect
+            </span>
           </Link>
         </div>
         <div className="ml-auto flex items-center gap-4">
@@ -40,8 +42,8 @@ const LoginPage = () => {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold">Welcome Back</h1>
-            <p className="text-gray-600 mt-2">
-              Sign in to access your account and dashboard
+            <p className="text-sm text-gray-600 mt-2">
+              Sign in to access your vendor dashboard
             </p>
           </div>
 
@@ -49,7 +51,7 @@ const LoginPage = () => {
 
           <div className="mt-8 text-center text-sm text-gray-600">
             <p>
-              New to JobMatch?{" "}
+              New to TheVendorsConnect?{" "}
               <Link
                 to="/register"
                 className="text-primary font-medium hover:underline"
@@ -62,7 +64,9 @@ const LoginPage = () => {
       </main>
 
       <footer className="py-6 text-center text-sm text-gray-500">
-        <p>© {new Date().getFullYear()} JobMatch. All rights reserved.</p>
+        <p>
+          © {new Date().getFullYear()} TheVendorsConnect. All rights reserved.
+        </p>
       </footer>
     </div>
   );

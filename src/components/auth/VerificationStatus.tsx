@@ -15,6 +15,9 @@ import { CheckCircle, AlertCircle, Clock, Mail, RefreshCw } from "lucide-react";
 interface VerificationStatusProps {
   email?: string;
   isVerified?: boolean;
+  isVerifying?: boolean;
+  error?: string | null;
+  token?: string | null;
   expiryTime?: Date;
   resendVerification?: () => void;
 }
@@ -22,6 +25,9 @@ interface VerificationStatusProps {
 const VerificationStatus = ({
   email = "user@example.com",
   isVerified = false,
+  isVerifying = false,
+  error = null,
+  token = null,
   expiryTime = new Date(Date.now() + 12 * 60 * 60 * 1000), // Default 12 hours from now
   resendVerification = () => console.log("Resend verification email"),
 }: VerificationStatusProps) => {
@@ -79,12 +85,24 @@ const VerificationStatus = ({
         </CardTitle>
         <CardDescription className="text-base mt-2">
           {isVerified
-            ? "Your email has been successfully verified. You can now proceed to your dashboard."
+            ? "Your email has been successfully verified. You will be redirected to your dashboard in a moment."
             : `We've sent a verification link to ${email}. Please check your inbox and click the link to verify your account.`}
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-6">
+        {error && (
+          <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+              <div>
+                <h4 className="font-medium text-red-800">Error</h4>
+                <p className="text-sm text-red-700 mt-1">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {!isVerified && (
           <>
             <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
@@ -121,9 +139,38 @@ const VerificationStatus = ({
                 onClick={resendVerification}
                 variant="outline"
                 className="w-full flex items-center gap-2"
+                disabled={isVerifying}
               >
-                <RefreshCw className="h-4 w-4" />
-                Resend Verification Email
+                {isVerifying ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4 mr-2"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4" />
+                    Resend Verification Email
+                  </>
+                )}
               </Button>
             </div>
           </>
@@ -139,7 +186,8 @@ const VerificationStatus = ({
                 </h4>
                 <p className="text-sm text-green-700 mt-1">
                   Your account has been successfully verified. You now have full
-                  access to all features.
+                  access to all features. You will be redirected to your
+                  dashboard shortly.
                 </p>
               </div>
             </div>
@@ -149,11 +197,18 @@ const VerificationStatus = ({
 
       <CardFooter className="flex justify-center">
         {isVerified ? (
-          <Button className="w-full sm:w-auto" asChild>
-            <Link to="/login">Go to Dashboard</Link>
+          <Button
+            className="w-full sm:w-auto bg-purple hover:bg-purple/90"
+            asChild
+          >
+            <Link to="/dashboard/vendor">Go to Dashboard</Link>
           </Button>
         ) : (
-          <Button variant="secondary" className="w-full sm:w-auto" asChild>
+          <Button
+            variant="secondary"
+            className="w-full sm:w-auto bg-purple/20 text-purple hover:bg-purple/30"
+            asChild
+          >
             <Link to="/login">Back to Login</Link>
           </Button>
         )}
