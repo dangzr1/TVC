@@ -35,14 +35,14 @@ import {
 } from "lucide-react";
 import GlobalActivityFeed from "./GlobalActivityFeed";
 import PersonalizedFeed from "./PersonalizedFeed";
-import RevenueAnalytics from "./RevenueAnalytics";
+import CEODashboard from "./CEODashboard";
 
 const SitewideDashboard = () => {
   const { user } = useAuth();
 
   // Check if user is admin, if not redirect to appropriate dashboard
   React.useEffect(() => {
-    if (user && user.user_metadata?.role !== "admin") {
+    if (user && user.role !== "admin") {
       window.location.href = `/dashboard/${user.role || "client"}`;
     }
   }, [user]);
@@ -61,14 +61,16 @@ const SitewideDashboard = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm text-gray-500">Active Users</p>
-                    <h3 className="text-2xl font-bold mt-1">1,245</h3>
+                    <h3 className="text-2xl font-bold mt-1">0</h3>
                   </div>
                   <div className="p-2 bg-white rounded-full shadow-sm">
                     <Users className="h-5 w-5 text-purple" />
                   </div>
                 </div>
                 <div className="flex items-center mt-2 text-xs">
-                  <span className="text-green-500 font-medium">+34 today</span>
+                  <span className="text-gray-500 font-medium">
+                    No new users today
+                  </span>
                 </div>
               </div>
 
@@ -76,15 +78,15 @@ const SitewideDashboard = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm text-gray-500">Messages</p>
-                    <h3 className="text-2xl font-bold mt-1">12.5k</h3>
+                    <h3 className="text-2xl font-bold mt-1">0</h3>
                   </div>
                   <div className="p-2 bg-white rounded-full shadow-sm">
                     <MessageSquare className="h-5 w-5 text-blue-500" />
                   </div>
                 </div>
                 <div className="flex items-center mt-2 text-xs">
-                  <span className="text-green-500 font-medium">
-                    +15% this week
+                  <span className="text-gray-500 font-medium">
+                    No messages yet
                   </span>
                 </div>
               </div>
@@ -93,15 +95,15 @@ const SitewideDashboard = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm text-gray-500">Active Jobs</p>
-                    <h3 className="text-2xl font-bold mt-1">387</h3>
+                    <h3 className="text-2xl font-bold mt-1">0</h3>
                   </div>
                   <div className="p-2 bg-white rounded-full shadow-sm">
                     <Briefcase className="h-5 w-5 text-green-600" />
                   </div>
                 </div>
                 <div className="flex items-center mt-2 text-xs">
-                  <span className="text-green-500 font-medium">
-                    +23 new today
+                  <span className="text-gray-500 font-medium">
+                    No active jobs
                   </span>
                 </div>
               </div>
@@ -110,15 +112,15 @@ const SitewideDashboard = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm text-gray-500">Revenue</p>
-                    <h3 className="text-2xl font-bold mt-1">$45.8k</h3>
+                    <h3 className="text-2xl font-bold mt-1">$0</h3>
                   </div>
                   <div className="p-2 bg-white rounded-full shadow-sm">
                     <DollarSign className="h-5 w-5 text-yellow-600" />
                   </div>
                 </div>
                 <div className="flex items-center mt-2 text-xs">
-                  <span className="text-green-500 font-medium">
-                    +12% this month
+                  <span className="text-gray-500 font-medium">
+                    No revenue yet
                   </span>
                 </div>
               </div>
@@ -156,9 +158,9 @@ const SitewideDashboard = () => {
                   <div>
                     <p className="text-sm font-medium">Active Regions</p>
                     <div className="flex items-center gap-1">
-                      <span className="text-sm">12 countries</span>
+                      <span className="text-sm">0 countries</span>
                       <span className="text-xs text-gray-500">
-                        +3 this month
+                        No active regions
                       </span>
                     </div>
                   </div>
@@ -171,11 +173,11 @@ const SitewideDashboard = () => {
                   <div>
                     <p className="text-sm font-medium">System Alerts</p>
                     <div className="flex items-center gap-1">
-                      <Badge className="bg-yellow-100 text-yellow-800">
-                        2 warnings
+                      <Badge className="bg-green-100 text-green-800">
+                        0 warnings
                       </Badge>
                       <span className="text-xs text-gray-500">
-                        View details
+                        System healthy
                       </span>
                     </div>
                   </div>
@@ -276,7 +278,7 @@ const SitewideDashboard = () => {
             <div className="mt-6 p-4 bg-purple/5 rounded-lg border border-purple/20">
               <h3 className="font-medium text-purple mb-2">Premium Status</h3>
               <p className="text-sm text-gray-600 mb-3">
-                Your premium subscription is active until June 15, 2023.
+                No active premium subscriptions.
               </p>
               <Button
                 className="w-full bg-purple hover:bg-purple/90"
@@ -297,15 +299,8 @@ const SitewideDashboard = () => {
       </div>
 
       {/* CEO Executive Dashboard */}
-      <div className="mt-8 p-4 bg-gradient-to-r from-purple/10 to-transparent border-2 border-purple rounded-lg">
-        <div className="flex items-center gap-2 mb-4">
-          <Crown className="h-6 w-6 text-purple" />
-          <h2 className="text-2xl font-bold text-purple">
-            CEO Executive Dashboard
-          </h2>
-          <Badge className="ml-2 bg-purple text-white">Admin Access</Badge>
-        </div>
-        <RevenueAnalytics />
+      <div className="mt-8">
+        <CEODashboard />
       </div>
     </div>
   );

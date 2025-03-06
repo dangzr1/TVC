@@ -123,24 +123,8 @@ const RegistrationForm = ({
           companyName: data.companyName,
         });
 
-        // Create a mock user for demo purposes
-        const mockUser = {
-          id: `demo-${Date.now()}`,
-          email: data.email,
-          user_metadata: {
-            first_name: data.firstName,
-            last_name: data.lastName,
-            role: data.accountType,
-            company_name: data.companyName || null,
-          },
-          email_confirmed_at: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-        };
-
-        // Store the mock user in localStorage
-        localStorage.setItem("dummyUser", JSON.stringify(mockUser));
-
-        // Redirect to dashboard
+        // Registration is now handled by Supabase
+        // Redirect to dashboard after registration
         window.location.href = `/dashboard/${data.accountType}`;
       }
     } catch (err: any) {

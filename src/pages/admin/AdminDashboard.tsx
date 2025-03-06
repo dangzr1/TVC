@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,32 +29,38 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { DataTable } from "@/components/ui/data-table";
+import UserDeleteConfirmation from "@/components/admin/UserDeleteConfirmation";
+import UserNotes from "@/components/admin/UserNotes";
 
 const AdminDashboard = () => {
   const { user } = useAuth();
 
   // Check if user is admin, if not redirect to appropriate dashboard
   React.useEffect(() => {
-    if (user && user.user_metadata?.role !== "admin") {
+    if (user && user?.role !== "admin") {
       window.location.href = `/dashboard/${user.role || "client"}`;
     }
   }, [user]);
   const [activeTab, setActiveTab] = useState("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const userNotesRef = useRef(null);
 
   // Mock data for admin dashboard
   const [stats, setStats] = useState({
-    totalUsers: 1245,
-    activeUsers: 876,
-    totalVendors: 432,
-    totalClients: 813,
-    pendingApprovals: 18,
-    reportedContent: 7,
-    totalRevenue: 45890,
-    activeListings: 387,
-    messagesExchanged: 12567,
-    newUsersToday: 34,
+    totalUsers: 0,
+    activeUsers: 0,
+    totalVendors: 0,
+    totalClients: 0,
+    pendingApprovals: 0,
+    reportedContent: 0,
+    totalRevenue: 0,
+    activeListings: 0,
+    messagesExchanged: 0,
+    newUsersToday: 0,
   });
 
   const [users, setUsers] = useState([
@@ -682,7 +688,13 @@ const AdminDashboard = () => {
                             size="sm"
                             className="h-8 w-8 p-0"
                             onClick={() => {
-                              alert(`Viewing profile for ${user.name}`);
+                              setSelectedUser(user);
+                              // Scroll to user notes section
+                              setTimeout(() => {
+                                userNotesRef.current?.scrollIntoView({
+                                  behavior: "smooth",
+                                });
+                              }, 100);
                             }}
                           >
                             <Eye className="h-4 w-4" />
@@ -743,34 +755,43 @@ const AdminDashboard = () => {
                             size="sm"
                             className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
                             onClick={() => {
-                              if (
-                                confirm(
-                                  `Are you sure you want to delete ${user.name}?`,
-                                )
-                              ) {
-                                setUsers(users.filter((u) => u.id !== user.id));
-
-                                // Show deletion notification
-                                const message = document.createElement("div");
-                                message.className =
-                                  "fixed top-4 right-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-200 shadow-md z-50 animate-in fade-in slide-in-from-top-5 duration-300";
-                                message.innerHTML = `<div class="flex items-center gap-2">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-                                  <span>User ${user.name} has been deleted</span>
-                                </div>`;
-                                document.body.appendChild(message);
-                                setTimeout(() => {
-                                  message.classList.add(
-                                    "animate-out",
-                                    "fade-out",
-                                    "slide-out-to-top-5",
-                                  );
-                                  setTimeout(
-                                    () => document.body.removeChild(message),
-                                    300,
-                                  );
-                                }, 3000);
-                              }
+                              // Show the enhanced delete confirmation dialog
+                              setUserToDelete({
+                                ...user,
+                                contributions: {
+                                  jobsPosted: Math.floor(Math.random() * 10),
+                                  applicationsSubmitted: Math.floor(
+                                    Math.random() * 20,
+                                  ),
+                                  messagesExchanged: Math.floor(
+                                    Math.random() * 100,
+                                  ),
+                                  reviewsWritten: Math.floor(Math.random() * 5),
+                                },
+                                flags: {
+                                  reportCount: Math.floor(Math.random() * 3),
+                                  lastReportReason:
+                                    Math.random() > 0.7
+                                      ? "Inappropriate behavior"
+                                      : undefined,
+                                  suspensionHistory: Math.floor(
+                                    Math.random() * 2,
+                                  ),
+                                },
+                                activity: {
+                                  lastLogin: new Date(
+                                    Date.now() -
+                                      Math.floor(Math.random() * 10) *
+                                        24 *
+                                        60 *
+                                        60 *
+                                        1000,
+                                  ).toLocaleDateString(),
+                                  averageSessionTime: `${Math.floor(Math.random() * 30)} minutes`,
+                                  completedProfile: Math.random() > 0.3,
+                                },
+                              });
+                              setIsDeleteDialogOpen(true);
                             }}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -780,8 +801,54 @@ const AdminDashboard = () => {
                     ))}
                   </div>
                 </div>
+
+                {/* User Notes Section */}
+                <div ref={userNotesRef}>
+                  {selectedUser && (
+                    <UserNotes
+                      userId={selectedUser.id}
+                      userName={selectedUser.name}
+                      userEmail={selectedUser.email}
+                      userRole={selectedUser.role}
+                      userStatus={selectedUser.status}
+                      joinDate={selectedUser.joinDate}
+                    />
+                  )}
+                </div>
               </CardContent>
             </Card>
+
+            {/* Delete Confirmation Dialog */}
+            {userToDelete && (
+              <UserDeleteConfirmation
+                isOpen={isDeleteDialogOpen}
+                onClose={() => setIsDeleteDialogOpen(false)}
+                onConfirm={() => {
+                  setUsers(users.filter((u) => u.id !== userToDelete.id));
+                  setIsDeleteDialogOpen(false);
+
+                  // Show deletion notification
+                  const message = document.createElement("div");
+                  message.className =
+                    "fixed top-4 right-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-200 shadow-md z-50 animate-in fade-in slide-in-from-top-5 duration-300";
+                  message.innerHTML = `<div class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                    <span>User ${userToDelete.name} has been permanently deleted</span>
+                  </div>`;
+                  document.body.appendChild(message);
+
+                  setTimeout(() => {
+                    message.classList.add(
+                      "animate-out",
+                      "fade-out",
+                      "slide-out-to-top-5",
+                    );
+                    setTimeout(() => document.body.removeChild(message), 300);
+                  }, 3000);
+                }}
+                user={userToDelete}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="approvals" className="space-y-6">

@@ -65,27 +65,7 @@ const LoginForm = ({
   const onFormSubmit = async (values: FormValues) => {
     setError(null);
     try {
-      // Special handling for admin login
-      if (
-        values.email === dummyAccounts.admin.email &&
-        values.password === dummyAccounts.admin.password
-      ) {
-        // Create a mock admin user in localStorage
-        const adminUser = {
-          id: "admin-user-id",
-          email: dummyAccounts.admin.email,
-          user_metadata: {
-            first_name: dummyAccounts.admin.firstName,
-            last_name: dummyAccounts.admin.lastName,
-            role: dummyAccounts.admin.role,
-          },
-          email_confirmed_at: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-        };
-        localStorage.setItem("dummyUser", JSON.stringify(adminUser));
-        navigate("/admin");
-        return;
-      }
+      // Admin login is now handled in the auth.ts file
 
       if (onSubmit) {
         onSubmit(values);

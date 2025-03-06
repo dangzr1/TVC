@@ -367,14 +367,7 @@ const RevenueAnalytics = () => {
                     <div>
                       <p className="text-sm text-gray-500">Total Revenue</p>
                       <h3 className="text-3xl font-bold mt-1">
-                        {showSensitiveData ? (
-                          formatCurrency(revenueData.total)
-                        ) : (
-                          <span className="flex items-center gap-2">
-                            <Lock className="h-4 w-4 text-gray-400" />
-                            <span className="blur-sm">$XXX,XXX</span>
-                          </span>
-                        )}
+                        formatCurrency(revenueData.total)
                       </h3>
                     </div>
                     <div className="p-3 bg-white rounded-full shadow-sm">
@@ -407,14 +400,7 @@ const RevenueAnalytics = () => {
                     <div>
                       <p className="text-sm text-gray-500">Projected Revenue</p>
                       <h3 className="text-3xl font-bold mt-1">
-                        {showSensitiveData ? (
-                          formatCurrency(revenueData.projectedRevenue)
-                        ) : (
-                          <span className="flex items-center gap-2">
-                            <Lock className="h-4 w-4 text-gray-400" />
-                            <span className="blur-sm">$XXX,XXX</span>
-                          </span>
-                        )}
+                        formatCurrency(revenueData.projectedRevenue)
                       </h3>
                     </div>
                     <div className="p-3 bg-blue-100 rounded-full shadow-sm">
@@ -439,14 +425,7 @@ const RevenueAnalytics = () => {
                     <div>
                       <p className="text-sm text-gray-500">Expenses</p>
                       <h3 className="text-3xl font-bold mt-1">
-                        {showSensitiveData ? (
-                          formatCurrency(revenueData.expenses)
-                        ) : (
-                          <span className="flex items-center gap-2">
-                            <Lock className="h-4 w-4 text-gray-400" />
-                            <span className="blur-sm">$XX,XXX</span>
-                          </span>
-                        )}
+                        formatCurrency(revenueData.expenses)
                       </h3>
                     </div>
                     <div className="p-3 bg-red-100 rounded-full shadow-sm">
@@ -470,14 +449,7 @@ const RevenueAnalytics = () => {
                     <div>
                       <p className="text-sm text-gray-500">Net Profit</p>
                       <h3 className="text-3xl font-bold mt-1">
-                        {showSensitiveData ? (
-                          formatCurrency(revenueData.profit)
-                        ) : (
-                          <span className="flex items-center gap-2">
-                            <Lock className="h-4 w-4 text-gray-400" />
-                            <span className="blur-sm">$XX,XXX</span>
-                          </span>
-                        )}
+                        formatCurrency(revenueData.profit)
                       </h3>
                     </div>
                     <div className="p-3 bg-green-100 rounded-full shadow-sm">
@@ -508,14 +480,7 @@ const RevenueAnalytics = () => {
                       <div className="text-center">
                         <div className="flex flex-col items-center justify-center gap-2">
                           <div className="text-4xl font-bold text-purple">
-                            {showSensitiveData ? (
-                              `$${revenueData.revenuePerMinute.toFixed(2)}`
-                            ) : (
-                              <span className="flex items-center gap-2">
-                                <Lock className="h-4 w-4 text-gray-400" />
-                                <span className="blur-sm">$X.XX</span>
-                              </span>
-                            )}
+                            `${revenueData.revenuePerMinute.toFixed(2)}`
                           </div>
                           <p className="text-gray-500">Revenue per minute</p>
                           <div className="flex items-center gap-2 mt-2">
@@ -570,14 +535,7 @@ const RevenueAnalytics = () => {
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-sm font-medium">
-                                {showSensitiveData ? (
-                                  formatCurrency(source.amount)
-                                ) : (
-                                  <span className="flex items-center gap-1">
-                                    <Lock className="h-3 w-3 text-gray-400" />
-                                    <span className="blur-sm">$XX,XXX</span>
-                                  </span>
-                                )}
+                                formatCurrency(source.amount)
                               </span>
                               <span className="text-xs text-gray-500">
                                 {formatPercentage(source.percentage)}
@@ -618,14 +576,7 @@ const RevenueAnalytics = () => {
                           </div>
                           <div className="text-right">
                             <p className="font-medium">
-                              {showSensitiveData ? (
-                                `$${transaction.amount.toFixed(2)}`
-                              ) : (
-                                <span className="flex items-center gap-1">
-                                  <Lock className="h-3 w-3 text-gray-400" />
-                                  <span className="blur-sm">$XX.XX</span>
-                                </span>
-                              )}
+                              `${transaction.amount.toFixed(2)}`
                             </p>
                             <p className="text-xs text-gray-500">
                               {transaction.time}

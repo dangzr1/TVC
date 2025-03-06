@@ -62,34 +62,20 @@ export const registerUser = async (data: UserRegistrationData) => {
 
 // Login a user
 export const loginUser = async ({ email, password }: UserLoginData) => {
-  // Check if this is a dummy account login
+  // Check if this is the admin account login
   if (
-    (email === dummyAccounts.vendor.email &&
-      password === dummyAccounts.vendor.password) ||
-    (email === dummyAccounts.client.email &&
-      password === dummyAccounts.client.password) ||
-    (email === dummyAccounts.admin.email &&
-      password === dummyAccounts.admin.password)
+    email === dummyAccounts.admin.email &&
+    password === dummyAccounts.admin.password
   ) {
-    // Determine which dummy account is being used
-    let dummyUser;
-    if (email === dummyAccounts.vendor.email) {
-      dummyUser = dummyAccounts.vendor;
-    } else if (email === dummyAccounts.client.email) {
-      dummyUser = dummyAccounts.client;
-    } else {
-      dummyUser = dummyAccounts.admin;
-    }
-
-    // Create a mock user session
+    // Create a mock admin user session
     const mockUser = {
-      id: `dummy-${dummyUser.role}-id`,
-      email: dummyUser.email,
+      id: `admin-user-id`,
+      email: dummyAccounts.admin.email,
       user_metadata: {
-        first_name: dummyUser.firstName,
-        last_name: dummyUser.lastName,
-        role: dummyUser.role,
-        company_name: dummyUser.companyName || null,
+        first_name: dummyAccounts.admin.firstName,
+        last_name: dummyAccounts.admin.lastName,
+        role: dummyAccounts.admin.role,
+        company_name: null,
       },
       email_confirmed_at: new Date().toISOString(),
       created_at: new Date().toISOString(),
@@ -102,8 +88,8 @@ export const loginUser = async ({ email, password }: UserLoginData) => {
     return {
       user: mockUser,
       session: {
-        access_token: "dummy-access-token",
-        refresh_token: "dummy-refresh-token",
+        access_token: "admin-access-token",
+        refresh_token: "admin-refresh-token",
         expires_at: Date.now() + 3600 * 1000, // 1 hour from now
       },
     };
@@ -122,36 +108,11 @@ export const loginUser = async ({ email, password }: UserLoginData) => {
 
 // Login with OAuth providers
 export const loginWithProvider = async (provider: "google" | "apple") => {
-  // For demo purposes, simulate a successful Google login with a dummy account
-  if (provider === "google") {
-    // Create a mock vendor user
-    const mockUser = {
-      id: `dummy-vendor-google-id`,
-      email: "google-user@example.com",
-      user_metadata: {
-        first_name: "Google",
-        last_name: "User",
-        role: "vendor",
-        company_name: "Google Photography",
-      },
-      email_confirmed_at: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-    };
-
-    // Store the mock user in localStorage to persist the session
-    localStorage.setItem("dummyUser", JSON.stringify(mockUser));
-
-    // Redirect to dashboard
-    window.location.href = "/dashboard/vendor";
-
-    return { provider, url: "/dashboard/vendor" };
-  }
-
   try {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/verify-email`,
+        redirectTo: `${window.location.origin}/dashboard/vendor`,
       },
     });
 
@@ -164,7 +125,7 @@ export const loginWithProvider = async (provider: "google" | "apple") => {
   } catch (error) {
     console.error(`Error in loginWithProvider (${provider}):`, error);
     throw new Error(
-      `Google authentication is not enabled in your Supabase project. Please use email/password registration instead.`,
+      `Authentication with ${provider} failed. Please try email/password login instead.`,
     );
   }
 };

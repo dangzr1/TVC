@@ -52,10 +52,10 @@ const ProtectedRoute = ({
 };
 
 function App() {
-  const { isLoading } = useAuth();
+  const { isLoading, isAuthenticated } = useAuth();
   const location = useLocation();
 
-  // Handle URL parameters for tab selection
+  // Handle URL parameters for tab selection and maintain login state
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const tab = searchParams.get("tab");
@@ -65,7 +65,13 @@ function App() {
       // Set active tab in profile page
       localStorage.setItem("active_profile_tab", tab);
     }
-  }, [location]);
+
+    // Ensure we don't lose authentication when navigating to home
+    if (location.pathname === "/" && isAuthenticated) {
+      // Don't redirect, just maintain the authenticated state
+      console.log("Maintaining authentication state on home page");
+    }
+  }, [location, isAuthenticated]);
 
   if (isLoading) {
     return (

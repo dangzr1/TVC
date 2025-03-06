@@ -22,6 +22,13 @@ const VendorDashboard = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-light-gray">
+      <header>
+        <title>Vendor Dashboard - TheVendorsConnect</title>
+        <meta
+          name="description"
+          content="Manage your vendor profile, view job opportunities, and connect with clients from your vendor dashboard."
+        />
+      </header>
       <DashboardHeader
         userName="Jane Smith"
         userRole="vendor"

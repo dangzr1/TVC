@@ -12,7 +12,14 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-light-gray">
+      <header>
+        <title>Sign In - TheVendorsConnect</title>
+        <meta
+          name="description"
+          content="Sign in to your TheVendorsConnect account to access your dashboard, messages, and connect with wedding professionals."
+        />
+      </header>
       {/* Header section */}
       <header className="w-full h-20 bg-white border-b border-gray-200 px-4 md:px-6 lg:px-8 flex items-center">
         <div className="flex items-center gap-2">

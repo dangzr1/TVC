@@ -43,7 +43,14 @@ const ClientDashboard = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-light-gray">
+      <header>
+        <title>Client Dashboard - TheVendorsConnect</title>
+        <meta
+          name="description"
+          content="Manage your wedding planning, find vendors, and track applications from your client dashboard."
+        />
+      </header>
       <DashboardHeader
         userName={displayName}
         userRole={userRole}
@@ -117,17 +124,27 @@ const ClientDashboard = ({
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-sm text-gray-500">
-              © {new Date().getFullYear()} JobMatch. All rights reserved.
+              © {new Date().getFullYear()} TheVendorsConnect. All rights
+              reserved.
             </div>
             <div className="flex space-x-4 mt-4 md:mt-0">
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-700">
+              <a
+                href="/privacy"
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
                 Privacy Policy
               </a>
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-700">
+              <a
+                href="/terms"
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
                 Terms of Service
               </a>
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-700">
-                Contact Us
+              <a
+                href="/faq"
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
+                FAQ
               </a>
             </div>
           </div>

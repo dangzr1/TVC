@@ -13,13 +13,20 @@ const Home = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-light-gray text-dark-gray">
+      <header>
+        <title>TheVendorsConnect - Wedding Professionals Community</title>
+        <meta
+          name="description"
+          content="Find and connect with wedding professionals in our community. TheVendorsConnect helps you discover the perfect vendors for your special day."
+        />
+      </header>
       <Navbar />
       {isAuthenticated ? (
         <div className="container mx-auto py-8 px-4 mt-16">
           <h1 className="text-3xl font-bold mb-6">
             Welcome to TheVendorsConnect
           </h1>
-          {user?.user_metadata?.role === "admin" ? (
+          {user?.role === "admin" ? (
             <SitewideDashboard />
           ) : (
             <div className="text-center py-12">
@@ -30,7 +37,7 @@ const Home = () => {
               <Button
                 className="bg-purple hover:bg-purple/90"
                 onClick={() =>
-                  (window.location.href = `/dashboard/${user?.user_metadata?.role || "client"}`)
+                  (window.location.href = `/dashboard/${user?.role || "client"}`)
                 }
               >
                 Go to Dashboard

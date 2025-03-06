@@ -1,24 +1,24 @@
-// This file contains dummy accounts for testing purposes
+// This file contains admin account information
 
 export const dummyAccounts = {
   vendor: {
-    email: "vendor@example.com",
-    password: "password123",
-    firstName: "John",
-    lastName: "Vendor",
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
     role: "vendor",
-    companyName: "Vendor Photography",
+    companyName: "",
   },
   client: {
-    email: "client@example.com",
-    password: "password123",
-    firstName: "Jane",
-    lastName: "Client",
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
     role: "client",
   },
   admin: {
-    email: "admin@thevendorsconnect.com",
-    password: "Admin123!",
+    email: "thevendorsconnect@gmail.com",
+    password: "Dn331770++",
     firstName: "Admin",
     lastName: "User",
     role: "admin",

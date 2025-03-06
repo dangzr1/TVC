@@ -12,7 +12,14 @@ const RegisterPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen flex flex-col bg-light-gray">
+      <header>
+        <title>Create Account - TheVendorsConnect</title>
+        <meta
+          name="description"
+          content="Join TheVendorsConnect community. Create your account as a client or vendor and connect with wedding professionals."
+        />
+      </header>
       <header className="w-full bg-white shadow-sm py-4 px-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center">

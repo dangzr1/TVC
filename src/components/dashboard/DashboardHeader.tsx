@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Settings,
@@ -95,7 +95,10 @@ const DashboardHeader = ({
 
   return (
     <>
-      <header className="w-full h-12 bg-white border-b border-gray-200 px-4 md:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-10">
+      <header
+        className="bg-white border-b border-gray-200 py-4 px-6 shadow-sm"
+        aria-label="Dashboard Header"
+      >
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" className="md:hidden">
             <Menu className="h-5 w-5" />
@@ -171,7 +174,10 @@ const DashboardHeader = ({
       </header>
 
       {/* Global Navigation Bar */}
-      <nav className="bg-white border-b border-gray-200 shadow-sm sticky top-12 z-10">
+      <nav
+        className="bg-white border-b border-gray-200 shadow-sm sticky top-12 z-10"
+        aria-label="Dashboard Navigation"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-12">
             <div className="flex space-x-8">
