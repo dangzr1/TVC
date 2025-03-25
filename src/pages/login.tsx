@@ -32,17 +32,6 @@ const LoginPage = () => {
             </span>
           </Link>
         </div>
-        <div className="ml-auto flex items-center gap-4">
-          <Link
-            to="/register"
-            className="text-sm font-medium text-gray-600 hover:text-gray-900"
-          >
-            Register
-          </Link>
-          <Link to="/login" className="text-sm font-medium text-primary">
-            Login
-          </Link>
-        </div>
       </header>
 
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6">

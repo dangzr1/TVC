@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import {
@@ -19,6 +19,11 @@ const AccountTypeSelector = ({
   onSelect = () => {},
 }: AccountTypeSelectorProps) => {
   const [selected, setSelected] = useState<"client" | "vendor">(selectedType);
+
+  // Store the selected account type in localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem("selectedAccountType", selected);
+  }, [selected]);
 
   const handleSelect = (type: "client" | "vendor") => {
     setSelected(type);

@@ -14,10 +14,7 @@ const CommunityChat = () => {
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
 
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  // No longer auto-scrolling to bottom when messages change
 
   const handleSendMessage = (e) => {
     e.preventDefault();

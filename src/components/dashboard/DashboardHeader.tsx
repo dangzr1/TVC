@@ -51,7 +51,7 @@ const DashboardHeader = ({
 
   // Use user data if available
   const displayName = user
-    ? `${user.user_metadata?.first_name || ""} ${user.user_metadata?.last_name || ""}`
+    ? `${user.firstName || ""} ${user.lastName || ""}`
     : userName;
 
   // Track session time
@@ -96,7 +96,7 @@ const DashboardHeader = ({
   return (
     <>
       <header
-        className="bg-white border-b border-gray-200 py-4 px-6 shadow-sm"
+        className="bg-white border-b border-gray-200 py-0.5 px-6 shadow-sm"
         aria-label="Dashboard Header"
       >
         <div className="flex items-center gap-2">
@@ -175,7 +175,7 @@ const DashboardHeader = ({
 
       {/* Global Navigation Bar */}
       <nav
-        className="bg-white border-b border-gray-200 shadow-sm sticky top-12 z-10"
+        className="bg-white border-b border-gray-200 shadow-sm sticky top-10 z-10"
         aria-label="Dashboard Navigation"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

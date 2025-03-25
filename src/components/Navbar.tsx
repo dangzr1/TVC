@@ -124,17 +124,11 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link
-                to="/login"
-                className="text-dark-gray hover:text-purple transition-all duration-200 hidden md:inline-block"
-              >
-                Sign in
-              </Link>
               <Button
                 className="bg-purple text-white hover:bg-lavender transition-all duration-200"
                 asChild
               >
-                <Link to="/register">Sign up</Link>
+                <Link to="/login">Sign in</Link>
               </Button>
             </>
           )}

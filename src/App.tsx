@@ -8,7 +8,6 @@ import {
 } from "react-router-dom";
 import Home from "./components/home";
 import LoginPage from "./pages/login";
-import RegisterPage from "./pages/register";
 import VerifyEmailPage from "./pages/verify-email";
 import ClientDashboard from "./pages/dashboard/client";
 import VendorDashboard from "./pages/dashboard/vendor";
@@ -93,7 +92,6 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route
             path="/profile"
@@ -137,6 +135,18 @@ function App() {
             }
           />
           <Route
+            path="/role-selection"
+            element={
+              <ProtectedRoute>
+                <Suspense fallback={<div>Loading...</div>}>
+                  {React.createElement(
+                    React.lazy(() => import("./pages/role-selection")),
+                  )}
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/faq"
             element={
               <Suspense fallback={<div>Loading...</div>}>
@@ -159,6 +169,16 @@ function App() {
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 {React.createElement(React.lazy(() => import("./pages/terms")))}
+              </Suspense>
+            }
+          />
+          <Route
+            path="/auth/callback"
+            element={
+              <Suspense fallback={<div>Loading...</div>}>
+                {React.createElement(
+                  React.lazy(() => import("./pages/auth/callback")),
+                )}
               </Suspense>
             }
           />

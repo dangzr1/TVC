@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirecting...</title>
+    <script>
+      // This script handles redirects for SPA routing when a user lands on a 404 page
+      // It's especially useful for handling OAuth redirects with hash fragments
+
+      // Check if the URL has a hash fragment that looks like an OAuth callback
+      const hasOAuthToken =
+        window.location.hash && window.location.hash.includes("access_token=");
+
+      // Store any auth tokens in localStorage for backup
+      if (hasOAuthToken) {
+        try {
+          const hashParams = new URLSearchParams(
+            window.location.hash.substring(1),
+          );
+          const accessToken = hashParams.get("access_token");
+          const refreshToken = hashParams.get("refresh_token") || "";
+
+          if (accessToken) {
+            localStorage.setItem("auth_token_backup", accessToken);
+            if (refreshToken) {
+              localStorage.setItem("refresh_token_backup", refreshToken);
+            }
+            console.log("Stored auth tokens in localStorage for backup");
+          }
+        } catch (e) {
+          console.error("Error storing auth tokens:", e);
+        }
+
+        // Extract the path from the URL (everything before the hash)
+        const path = window.location.pathname;
+
+        // If the path contains 'dashboard', we need to redirect to the auth callback
+        if (path.includes("/dashboard/")) {
+          // Extract role from URL if we're on a dashboard page
+          const urlParts = path.split("/");
+          const roleIndex =
+            urlParts.findIndex((part) => part === "dashboard") + 1;
+          if (roleIndex < urlParts.length) {
+            const role = urlParts[roleIndex];
+            // Store the role in localStorage
+            localStorage.setItem("userRole", role);
+            localStorage.setItem("pendingOAuthRole", role);
+            console.log("Extracted and stored role from URL:", role);
+          }
+
+          // Redirect to the auth callback route while preserving the hash fragment
+          window.location.href = "/auth/callback" + window.location.hash;
+        } else {
+          // For other paths with auth token, redirect to auth callback
+          window.location.href = "/auth/callback" + window.location.hash;
+        }
+      } else {
+        // For regular 404s, redirect to the home page
+        window.location.href = "/";
+      }
+    </script>
+  </head>
+  <body>
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+      "
+    >
+      <h1>Redirecting...</h1>
+      <p>Please wait while we redirect you to the correct page.</p>
+    </div>
+  </body>
+</html>

@@ -77,7 +77,7 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <Link
-                  to="/register"
+                  to="/login"
                   className="text-lavender hover:text-white transition-all duration-200"
                 >
                   List Your Services

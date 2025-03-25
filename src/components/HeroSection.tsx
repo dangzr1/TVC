@@ -28,23 +28,14 @@ const HeroSection = () => {
         </h1>
 
         <p className="text-xl text-white mb-10 max-w-2xl mx-auto">
-          Find and connect with wedding professionals in our community chat
-          below
+          Find and connect with wedding professionals in our community
         </p>
 
         <div className="flex justify-center gap-4">
           <Button
             asChild
             size="lg"
-            className="bg-white text-purple hover:bg-gray-100"
-          >
-            <Link to="/register">Join Our Community</Link>
-          </Button>
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="border-white text-white hover:bg-white/10"
+            className="bg-white text-black hover:bg-gray-100"
           >
             <Link to="/login">Sign In</Link>
           </Button>
