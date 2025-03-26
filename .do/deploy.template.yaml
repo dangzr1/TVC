@@ -1,0 +1,21 @@
+spec:
+  name: thevendorsconnect
+  services:
+  - name: web
+    git:
+      branch: main
+      repo_clone_url: ${GITHUB_REPO_URL:-https://github.com/yourusername/thevendorsconnect.git}
+    build_command: npm install && npm run build-no-errors
+    run_command: npm run preview -- --host 0.0.0.0 --port 8080
+    http_port: 8080
+    instance_size: basic-xs
+    routes:
+    - path: /
+    envs:
+    - key: VITE_SUPABASE_URL
+      scope: RUN_TIME
+      value: ${VITE_SUPABASE_URL}
+    - key: VITE_SUPABASE_ANON_KEY
+      scope: RUN_TIME
+      value: ${VITE_SUPABASE_ANON_KEY}
+
