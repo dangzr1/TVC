@@ -15,6 +15,23 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   },
 });
 
+// Create a service role client for admin operations
+// This should only be used in secure contexts (like edge functions)
+export const getServiceRoleClient = () => {
+  const supabaseServiceKey = import.meta.env.SUPABASE_SERVICE_KEY || "";
+  if (!supabaseServiceKey) {
+    console.error("Missing SUPABASE_SERVICE_KEY environment variable");
+    return null;
+  }
+
+  return createClient<Database>(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+};
+
 // Mock data for conversations
 const mockConversations = [
   {

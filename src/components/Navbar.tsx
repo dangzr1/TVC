@@ -98,7 +98,7 @@ const Navbar = () => {
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
             <>
-              {user?.role === "admin" ? (
+              {user?.role === "admin" && user?.email === "dangzr1@gmail.com" ? (
                 <Button
                   variant="ghost"
                   className="text-dark-gray hover:text-purple transition-all duration-200 hidden md:inline-block"
@@ -128,7 +128,9 @@ const Navbar = () => {
                 className="bg-purple text-white hover:bg-lavender transition-all duration-200"
                 asChild
               >
-                <Link to="/login">Sign in</Link>
+                <Link to="/login">
+                  <span className="text-black font-medium">Sign in</span>
+                </Link>
               </Button>
             </>
           )}

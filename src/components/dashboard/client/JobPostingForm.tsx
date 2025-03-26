@@ -254,7 +254,7 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-purple hover:bg-purple/90"
+                className="bg-purple hover:bg-purple/90 text-black font-medium"
               >
                 {isSubmitting
                   ? "Saving..."

@@ -58,8 +58,6 @@ const GlobalActivityFeed = () => {
         return <Briefcase className="h-4 w-4 text-purple" />;
       case "application":
         return <Briefcase className="h-4 w-4 text-green-500" />;
-      case "premium":
-        return <Star className="h-4 w-4 text-yellow-500" />;
       case "review":
         return <Star className="h-4 w-4 text-orange-500" />;
       case "user":
@@ -96,8 +94,6 @@ const GlobalActivityFeed = () => {
         return "bg-purple/10 text-purple border-purple/20";
       case "application":
         return "bg-green-100 text-green-800 border-green-200";
-      case "premium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "review":
         return "bg-orange-100 text-orange-800 border-orange-200";
       case "user":
@@ -143,14 +139,13 @@ const GlobalActivityFeed = () => {
       </CardHeader>
       <div className="px-6">
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-7 mb-4">
+          <TabsList className="grid grid-cols-6 mb-4">
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="message">Messages</TabsTrigger>
             <TabsTrigger value="job">Jobs</TabsTrigger>
             <TabsTrigger value="application">Applications</TabsTrigger>
             <TabsTrigger value="user">Users</TabsTrigger>
             <TabsTrigger value="review">Reviews</TabsTrigger>
-            <TabsTrigger value="premium">Premium</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>

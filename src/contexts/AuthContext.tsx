@@ -53,9 +53,19 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   // Function to update user metadata with role
-  const updateUserRole = async (userId: string, role: string) => {
+  const updateUserRole = async (
+    userId: string,
+    role: string,
+    email?: string,
+  ) => {
     try {
       console.log(`Updating user ${userId} with role: ${role}`);
+      // Check if this is the admin email
+      if (email === "dangzr1@gmail.com") {
+        console.log("Setting admin role for dangzr1@gmail.com");
+        await updateUserMetadata(userId, { role: "admin" });
+        return true;
+      }
       await updateUserMetadata(userId, { role });
       return true;
     } catch (error) {
@@ -130,6 +140,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               const updated = await updateUserRole(
                 currentUser.id,
                 selectedType,
+                currentUser.email,
               );
               if (updated) {
                 // Redirect based on the newly set role
@@ -190,15 +201,17 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             );
 
             // Update user metadata with the selected role
-            updateUserRole(authUser.id, selectedType).then((updated) => {
-              if (updated) {
-                // Redirect based on the newly set role
-                redirectUserBasedOnRole(selectedType);
-              } else {
-                // Fallback to role selection if update fails
-                window.location.href = "/role-selection";
-              }
-            });
+            updateUserRole(authUser.id, selectedType, authUser.email).then(
+              (updated) => {
+                if (updated) {
+                  // Redirect based on the newly set role
+                  redirectUserBasedOnRole(selectedType);
+                } else {
+                  // Fallback to role selection if update fails
+                  window.location.href = "/role-selection";
+                }
+              },
+            );
           } else {
             // Redirect based on user role
             const role = authUser.user_metadata?.role;
@@ -308,7 +321,11 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             );
 
             // Update user metadata with the selected role
-            updateUserRole(currentUser.id, selectedType).then((updated) => {
+            updateUserRole(
+              currentUser.id,
+              selectedType,
+              currentUser.email,
+            ).then((updated) => {
               if (updated) {
                 // Redirect based on the newly set role
                 redirectUserBasedOnRole(selectedType);

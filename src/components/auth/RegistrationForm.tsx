@@ -12,6 +12,8 @@ import {
   CardFooter,
 } from "../ui/card";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 interface RegistrationFormProps {
   onSubmit?: (data: any) => void;
@@ -26,6 +28,12 @@ const RegistrationForm = ({
 }: RegistrationFormProps) => {
   const { loginWithGoogle, isLoading: authLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // Use either the external loading state or the auth loading state
   const isLoading =
@@ -34,10 +42,14 @@ const RegistrationForm = ({
   const handleGoogleSignup = async () => {
     setError(null);
     try {
-      // Make sure the account type is saved before login
-      localStorage.setItem("selectedAccountType", accountType);
+      // Use the account type passed as prop, but if not available, use the one from localStorage
+      const selectedType =
+        accountType ||
+        (localStorage.getItem("selectedAccountType") as "client" | "vendor") ||
+        "client";
+      localStorage.setItem("selectedAccountType", selectedType);
       console.log(
-        `Registration: Setting account type to ${accountType} before Google login`,
+        `Registration: Setting account type to ${selectedType} before Google login`,
       );
       await loginWithGoogle();
       // The redirect will happen automatically through the auth context
@@ -45,6 +57,34 @@ const RegistrationForm = ({
       console.error("Google login error:", err);
       setError(err.message || "Google login failed. Please try again.");
     }
+  };
+
+  const handleUsernameSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    // Validate username
+    if (username.length < 3) {
+      setError("Username must be at least 3 characters long");
+      return;
+    }
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    // Validate password strength
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return;
+    }
+
+    // For now, just show a message that username registration is coming soon
+    setError(
+      "Username registration will be available soon. Please use Google sign-in for now.",
+    );
   };
 
   return (
@@ -71,9 +111,89 @@ const RegistrationForm = ({
             </p>
           </div>
 
+          <form onSubmit={handleUsernameSignup} className="space-y-4 mb-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  placeholder="Enter your first name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  placeholder="Enter your last name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                placeholder="Choose a username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Create a password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-purple hover:bg-purple/90 text-black font-medium"
+              disabled={isLoading}
+            >
+              {isLoading ? "Creating account..." : "Create account"}
+            </Button>
+          </form>
+
           <div className="text-center mt-6">
             <p className="text-sm text-gray-500 mb-4">
-              Create your account with:
+              Or create your account with:
             </p>
 
             <Button

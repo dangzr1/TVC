@@ -103,32 +103,60 @@ export const loginUser = async ({ email, password }: UserLoginData) => {
     email === dummyAccounts.admin.email &&
     password === dummyAccounts.admin.password
   ) {
-    // Create a mock admin user session
-    const mockUser = {
-      id: `admin-user-id`,
+    // Check if admin user already exists in Supabase
+    const { data: existingUser } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", dummyAccounts.admin.email)
+      .maybeSingle();
+
+    if (!existingUser) {
+      // Create a real admin user in Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: dummyAccounts.admin.email,
+        password: dummyAccounts.admin.password,
+        options: {
+          data: {
+            first_name: dummyAccounts.admin.firstName,
+            last_name: dummyAccounts.admin.lastName,
+            role: dummyAccounts.admin.role,
+            company_name: null,
+          },
+        },
+      });
+
+      if (authError) {
+        console.error("Error creating admin user:", authError);
+        throw authError;
+      }
+
+      // Create the user record in the users table
+      if (authData.user) {
+        const { error: userError } = await supabase.from("users").insert({
+          id: authData.user.id,
+          email: dummyAccounts.admin.email,
+          role: dummyAccounts.admin.role,
+          first_name: dummyAccounts.admin.firstName,
+          last_name: dummyAccounts.admin.lastName,
+          created_at: new Date().toISOString(),
+          last_sign_in: new Date().toISOString(),
+        });
+
+        if (userError) {
+          console.error("Error creating admin user record:", userError);
+        }
+      }
+    }
+
+    // Now sign in with the admin credentials
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: dummyAccounts.admin.email,
-      user_metadata: {
-        first_name: dummyAccounts.admin.firstName,
-        last_name: dummyAccounts.admin.lastName,
-        role: dummyAccounts.admin.role,
-        company_name: null,
-      },
-      email_confirmed_at: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-    };
+      password: dummyAccounts.admin.password,
+    });
 
-    // Store the mock user in localStorage to persist the session
-    localStorage.setItem("dummyUser", JSON.stringify(mockUser));
+    if (error) throw error;
 
-    // Return a mock session object
-    return {
-      user: mockUser,
-      session: {
-        access_token: "admin-access-token",
-        refresh_token: "admin-refresh-token",
-        expires_at: Date.now() + 3600 * 1000, // 1 hour from now
-      },
-    };
+    return { user: data.user, session: data.session };
   }
 
   // If not a dummy account, proceed with normal Supabase auth
@@ -211,10 +239,9 @@ export const loginWithProvider = async (provider: "google" | "apple") => {
 
 // Logout the current user
 export const logoutUser = async () => {
-  // Check if we have a dummy user to log out
+  // Remove any dummy user data if it exists (for backward compatibility)
   if (localStorage.getItem("dummyUser")) {
     localStorage.removeItem("dummyUser");
-    return { success: true };
   }
 
   // Otherwise, sign out from Supabase
@@ -227,10 +254,10 @@ export const logoutUser = async () => {
 
 // Get the current user
 export const getCurrentUser = async () => {
-  // Check if we have a dummy user in localStorage
+  // Check if we have a dummy user in localStorage (for backward compatibility)
   const dummyUserJson = localStorage.getItem("dummyUser");
   if (dummyUserJson) {
-    return JSON.parse(dummyUserJson);
+    localStorage.removeItem("dummyUser"); // Remove it as we're transitioning to real users
   }
 
   // Otherwise, get the real user from Supabase
@@ -266,27 +293,21 @@ export const resendVerificationEmail = async (email: string) => {
 
 // Setup auth state change listener
 export const setupAuthListener = (callback: (user: any) => void) => {
-  // Check for dummy user first
+  // Check for dummy user (for backward compatibility)
   const dummyUserJson = localStorage.getItem("dummyUser");
   if (dummyUserJson) {
-    const dummyUser = JSON.parse(dummyUserJson);
-    setTimeout(() => callback(dummyUser), 0);
+    localStorage.removeItem("dummyUser"); // Remove it as we're transitioning to real users
   }
 
   // Set up the real listener for Supabase auth changes
   return supabase.auth.onAuthStateChange((event, session) => {
-    // If we have a dummy user and the event is SIGNED_OUT, remove the dummy user
-    if (event === "SIGNED_OUT" && localStorage.getItem("dummyUser")) {
+    // If there's any dummy user data, remove it (for backward compatibility)
+    if (localStorage.getItem("dummyUser")) {
       localStorage.removeItem("dummyUser");
     }
 
-    // Check for dummy user again (in case it was just added)
-    const updatedDummyUserJson = localStorage.getItem("dummyUser");
-    if (updatedDummyUserJson) {
-      callback(JSON.parse(updatedDummyUserJson));
-    } else {
-      callback(session?.user || null);
-    }
+    // Always use the real session
+    callback(session?.user || null);
   });
 };
 
@@ -320,4 +341,55 @@ export const updateUserMetadata = async (metadata: Record<string, any>) => {
   }
 
   return data;
+};
+
+// Update user role to admin
+export const updateUserToAdmin = async (email: string) => {
+  try {
+    // First, get the user by email
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select("id, email, role")
+      .eq("email", email)
+      .single();
+
+    if (userError) {
+      console.error("Error finding user:", userError);
+      throw new Error(`User with email ${email} not found`);
+    }
+
+    if (!userData) {
+      throw new Error(`User with email ${email} not found`);
+    }
+
+    // Update the user's role in auth metadata
+    const { data: authData, error: authError } =
+      await supabase.auth.admin.updateUserById(userData.id, {
+        user_metadata: { role: "admin" },
+      });
+
+    if (authError) {
+      console.error("Error updating user auth metadata:", authError);
+      throw authError;
+    }
+
+    // Update the user's role in the users table
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ role: "admin" })
+      .eq("id", userData.id);
+
+    if (updateError) {
+      console.error("Error updating user role in users table:", updateError);
+      throw updateError;
+    }
+
+    return {
+      success: true,
+      message: `User ${email} has been upgraded to admin`,
+    };
+  } catch (error) {
+    console.error("Error in updateUserToAdmin:", error);
+    throw error;
+  }
 };

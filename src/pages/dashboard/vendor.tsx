@@ -47,7 +47,10 @@ const VendorDashboard = () => {
             </p>
           </div>
 
-          {/* Live Job Feed removed */}
+          {/* Live Job Feed */}
+          <div className="mb-8">
+            <LiveJobFeed />
+          </div>
 
           {/* Open Positions Notification */}
           <OpenPositionsNotification />

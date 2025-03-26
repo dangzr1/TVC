@@ -3,7 +3,6 @@ import Navbar from "./Navbar";
 import HeroSection from "./HeroSection";
 import CTASection from "./CTASection";
 import Footer from "./Footer";
-import CommunityChat from "./CommunityChat";
 import SitewideDashboard from "./SitewideDashboard";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "./ui/button";
@@ -48,7 +47,6 @@ const Home = () => {
             )}
           </div>
         ) : null}
-        <CommunityChat />
       </div>
       <CTASection />
       <Footer />

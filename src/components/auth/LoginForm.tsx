@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
+import { loginWithUsername } from "@/lib/usernameAuth";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +13,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface LoginFormProps {
   onSubmit?: (values: any) => void;
@@ -26,6 +29,9 @@ const LoginForm = ({
 }: LoginFormProps) => {
   const { loginWithGoogle, isLoading: authLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Use either the external loading state or the auth loading state
   const isLoading =
@@ -34,15 +40,58 @@ const LoginForm = ({
   const handleGoogleLogin = async () => {
     setError(null);
     try {
-      // Store the selected account type in localStorage
-      localStorage.setItem("selectedAccountType", accountType);
-      console.log(`Login: Using account type ${accountType} for Google login`);
+      // Use the account type passed as prop, but if not available, use the one from localStorage
+      const selectedType =
+        accountType ||
+        (localStorage.getItem("selectedAccountType") as "client" | "vendor") ||
+        "client";
+      localStorage.setItem("selectedAccountType", selectedType);
+      console.log(`Login: Using account type ${selectedType} for Google login`);
       await loginWithGoogle();
       // The redirect will happen automatically through the auth context
       console.log("Google login initiated, waiting for redirect");
     } catch (err: any) {
       console.error("Google login error:", err);
       setError(err.message || "Google login failed. Please try again.");
+    }
+  };
+
+  const handleUsernameLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!username || !password) {
+      setError("Username and password are required");
+      return;
+    }
+
+    try {
+      const {
+        user,
+        session,
+        error: loginError,
+      } = await loginWithUsername(username, password);
+
+      if (loginError) {
+        setError(loginError);
+        return;
+      }
+
+      if (!user) {
+        setError("Invalid username or password");
+        return;
+      }
+
+      // If we have a successful login, redirect to the appropriate dashboard
+      const role = user.user_metadata?.role || "client";
+      if (role === "admin") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = `/dashboard/${role}`;
+      }
+    } catch (err: any) {
+      console.error("Username login error:", err);
+      setError(err.message || "Login failed. Please try again.");
     }
   };
 
@@ -62,8 +111,69 @@ const LoginForm = ({
           </Alert>
         )}
 
+        <form onSubmit={handleUsernameLogin} className="space-y-4 mb-6">
+          <div className="space-y-2">
+            <Label htmlFor="username">Username or Email</Label>
+            <Input
+              id="username"
+              type="text"
+              placeholder="Enter your username or email"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <Label htmlFor="password">Password</Label>
+              <Link
+                to="/forgot-password"
+                className="text-xs text-purple hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3 text-gray-400 hover:text-gray-600"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+                <span className="sr-only">
+                  {showPassword ? "Hide password" : "Show password"}
+                </span>
+              </Button>
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full bg-purple hover:bg-purple/90"
+            disabled={isLoading}
+          >
+            <span className="text-black font-medium">
+              {isLoading ? "Signing in..." : "Sign in"}
+            </span>
+          </Button>
+        </form>
+
         <div className="flex flex-col items-center justify-center space-y-4">
-          <p className="text-center text-gray-600">Sign in to continue</p>
+          <p className="text-center text-gray-600">Or sign in with</p>
 
           <Button
             variant="default"
@@ -102,6 +212,12 @@ const LoginForm = ({
       </CardContent>
       <CardFooter className="flex flex-col space-y-4 px-0">
         <div className="text-center text-sm mt-4">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-purple hover:underline">
+            Sign up
+          </Link>
+        </div>
+        <div className="text-center text-sm">
           By signing in, you agree to our{" "}
           <Button variant="link" className="p-0" type="button" asChild>
             <Link to="/terms">Terms of Service</Link>

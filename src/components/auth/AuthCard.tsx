@@ -20,7 +20,11 @@ const AuthCard = ({
   isLoading = false,
 }: AuthCardProps) => {
   const [activeTab, setActiveTab] = useState<"login" | "register">(defaultTab);
-  const [accountType, setAccountType] = useState<"client" | "vendor">("client");
+  // Initialize account type from localStorage if available
+  const [accountType, setAccountType] = useState<"client" | "vendor">(
+    (localStorage.getItem("selectedAccountType") as "client" | "vendor") ||
+      "client",
+  );
 
   const handleTabChange = (value: string) => {
     setActiveTab(value as "login" | "register");
@@ -30,6 +34,7 @@ const AuthCard = ({
     setAccountType(type);
     // Store the selected account type in localStorage
     localStorage.setItem("selectedAccountType", type);
+    console.log(`AuthCard: Account type changed to ${type}`);
   };
 
   return (

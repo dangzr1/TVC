@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   PlusCircle,
   Edit,
@@ -142,9 +142,14 @@ const JobPostingTools: React.FC<JobPostingToolsProps> = ({
 }) => {
   // State for jobs and applications
   const [jobs, setJobs] = useState<JobPost[]>(() => {
-    // Try to load jobs from localStorage
-    const savedJobs = localStorage.getItem("savedJobs");
-    return savedJobs ? JSON.parse(savedJobs) : initialJobs;
+    try {
+      // Try to load jobs from localStorage
+      const savedJobs = localStorage.getItem("savedJobs");
+      return savedJobs ? JSON.parse(savedJobs) : initialJobs;
+    } catch (error) {
+      console.error("Error loading jobs from localStorage:", error);
+      return initialJobs;
+    }
   });
   const [applications, setApplications] =
     useState<JobApplication[]>(initialApplications);
@@ -156,6 +161,46 @@ const JobPostingTools: React.FC<JobPostingToolsProps> = ({
   const [showContactInfo, setShowContactInfo] = useState<
     Record<string, boolean>
   >({});
+
+  // Listen for new job posted events from the parent component
+  useEffect(() => {
+    const handleNewJobPosted = (event: CustomEvent) => {
+      console.log("New job posted event received:", event.detail);
+      const newJobData = event.detail;
+
+      // Create a new job object with the received data
+      const newJob = {
+        id: newJobData.id || `${jobs.length + 1}`,
+        title: newJobData.title || "New Job",
+        description: "New job description",
+        requirements: "Requirements not specified",
+        location: newJobData.location || "Remote",
+        salary: newJobData.salary || "Competitive",
+        status: newJobData.type === "Full-time" ? "active" : "draft",
+        createdAt: new Date().toISOString().split("T")[0],
+        applicationsCount: 0,
+      };
+
+      // Add the new job to the jobs list
+      const updatedJobs = [newJob, ...jobs];
+      setJobs(updatedJobs);
+      localStorage.setItem("savedJobs", JSON.stringify(updatedJobs));
+    };
+
+    // Add event listener for custom event
+    window.addEventListener(
+      "newJobPosted",
+      handleNewJobPosted as EventListener,
+    );
+
+    // Clean up event listener on component unmount
+    return () => {
+      window.removeEventListener(
+        "newJobPosted",
+        handleNewJobPosted as EventListener,
+      );
+    };
+  }, [jobs]);
 
   const handleCreateJob = (data: any) => {
     console.log("Creating job:", data);
@@ -321,7 +366,10 @@ const JobPostingTools: React.FC<JobPostingToolsProps> = ({
         <TabsContent value="postings" className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold">Manage Job Postings</h2>
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
+            <Button
+              onClick={() => setIsCreateDialogOpen(true)}
+              className="bg-purple hover:bg-purple/90 text-black font-medium"
+            >
               <PlusCircle className="mr-2 h-4 w-4" />
               Create New Job
             </Button>

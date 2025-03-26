@@ -33,6 +33,7 @@ import {
   BarChart2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import GlobalActivityFeed from "./GlobalActivityFeed";
 
 const PersonalizedFeed = () => {
   const [activeTab, setActiveTab] = useState("foryou");
@@ -132,7 +133,7 @@ const PersonalizedFeed = () => {
           value={activeTab}
           onValueChange={setActiveTab}
         >
-          <TabsList className="grid grid-cols-5 mb-4">
+          <TabsList className="grid grid-cols-6 mb-4">
             <TabsTrigger value="foryou" className="flex items-center gap-1">
               <Zap className="h-4 w-4" />
               For You
@@ -155,6 +156,10 @@ const PersonalizedFeed = () => {
             <TabsTrigger value="saved" className="flex items-center gap-1">
               <Bookmark className="h-4 w-4" />
               Saved
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="flex items-center gap-1">
+              <Bell className="h-4 w-4" />
+              Activity
             </TabsTrigger>
           </TabsList>
 
@@ -258,16 +263,6 @@ const PersonalizedFeed = () => {
                             }
                           >
                             View Profile
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8"
-                            onClick={() =>
-                              (window.location.href = `/messages?user=${activity.id}`)
-                            }
-                          >
-                            Message
                           </Button>
                         </div>
                       </div>
@@ -428,6 +423,10 @@ const PersonalizedFeed = () => {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="activity" className="mt-0">
+            <GlobalActivityFeed />
           </TabsContent>
         </Tabs>
       </CardContent>
