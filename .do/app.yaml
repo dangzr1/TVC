@@ -1,0 +1,19 @@
+name: thevendorsconnect
+services:
+- name: web
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: dangzr1/TVC
+  build_command: ./do-build.sh
+  run_command: npm run preview -- --host 0.0.0.0 --port ${PORT:-8080}
+  http_port: 8080
+  instance_size: basic-xs
+  routes:
+  - path: /
+  envs:
+  - key: VITE_SUPABASE_URL
+    scope: RUN_TIME
+  - key: VITE_SUPABASE_ANON_KEY
+    scope: RUN_TIME
+
